@@ -18,7 +18,8 @@ if(sum(ls()=="NEI") == 0){
 
 #plot total annual emissions
 library(plyr)
-annual_pollutants <- ddply(NEI,.(year),summarise,total_emissions=sum(Emissions))
-png(filename = "plot1.png", width = 480, height = 480, units = "px")
-plot(annual_pollutants, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual emissions")
+Baltimore_city_Maryland_Emissions <- NEI[NEI$fips=="24510",]
+baltimore_annual_pollutants <- ddply(Baltimore_city_Maryland_Emissions,.(year),summarise,total_emissions=sum(Emissions))
+png(filename = "plot2.png", width = 480, height = 480, units = "px")
+plot(baltimore_annual_pollutants, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual emissions in Baltimore")
 dev.off()
