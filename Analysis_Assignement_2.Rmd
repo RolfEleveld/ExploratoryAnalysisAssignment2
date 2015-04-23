@@ -104,6 +104,7 @@ qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~
 ```
 
 4.Across the United States, how have emissions from coal combustion-related sources changed from 1999-2008?
+Find the SCC data that has SCC$EI.Sector with the word coal or SCC$SCC.Level.Three having the word "coal"
 
 5.How have emissions from motor vehicle sources changed from 1999-2008 in Baltimore City? 
 
