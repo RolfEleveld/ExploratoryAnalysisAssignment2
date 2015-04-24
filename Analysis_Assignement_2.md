@@ -52,7 +52,8 @@ as long as each of those files is in your current working directory (check by ca
 
 # Downloading and preprocessing the data
 The data is from EPA avalable on:
-```{r collecting data}
+
+```r
 if (!file.exists("summarySCC_PM25.rds")){
     if (!file.exists("NEI_data.zip")){
         setInternet2(use = TRUE)
@@ -67,7 +68,8 @@ if (!file.exists("summarySCC_PM25.rds")){
 
 ## load data into a data frame
 The data is RDS data and can be extracted by using readRDS. the below may take a while.
-```{r loading data}
+
+```r
 NEI <- readRDS("summarySCC_PM25.rds")
 SCC <- readRDS("Source_Classification_Code.rds")
 ```
@@ -76,12 +78,16 @@ SCC <- readRDS("Source_Classification_Code.rds")
 You must address the following questions and tasks in your exploratory analysis. For each question/task you will need to make a single plot. Unless specified, you can use any plotting system in R to make your plot.
 
 1.Have total emissions from PM2.5 decreased in the United States from 1999 to 2008? Using the base plotting system, make a plot showing the total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
-The list of years are: `r unique(NEI$year)`
-```{r a quick overview of samples taken in each year}
+The list of years are: 1999, 2002, 2005, 2008
+
+```r
 hist(NEI$year, xlab="Year", ylab="count of measures", main="Measurements Histogram")
 ```
-Since there is only `r unique(NEI$Pollutant)` in the samples, they can be summed up.
-```{r summing up the pollutants}
+
+![plot of chunk a quick overview of samples taken in each year](figure/a quick overview of samples taken in each year-1.png) 
+Since there is only PM25-PRI in the samples, they can be summed up.
+
+```r
 library(plyr)
 annual_pollutants <- ddply(NEI,.(year),summarise,total_emissions=sum(Emissions))
 plot(annual_pollutants, type="h", 
@@ -89,8 +95,11 @@ plot(annual_pollutants, type="h",
      main="Total annual emissions")
 ```
 
+![plot of chunk summing up the pollutants](figure/summing up the pollutants-1.png) 
+
 2.Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
-```{r emissions in Baltimore}
+
+```r
 Baltimore_city_Maryland_Emissions <- NEI[NEI$fips=="24510",]
 baltimore_annual_pollutants <- ddply(Baltimore_city_Maryland_Emissions,.(year),summarise,total_emissions=sum(Emissions))
 plot(baltimore_annual_pollutants, type="h", 
@@ -98,21 +107,33 @@ plot(baltimore_annual_pollutants, type="h",
      main="Total annual emissions in Baltimore")
 ```
 
+![plot of chunk emissions in Baltimore](figure/emissions in Baltimore-1.png) 
+
 3.Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999-2008 for Baltimore City? Which have seen increases in emissions from 1999-2008? Use the ggplot2 plotting system to make a plot answer this question.
-```{r emissions in baltimore by type}
+
+```r
 library(ggplot2)
 #need to combine emissions per type per year first
 baltimore_annual_pollutants_by_type <- ddply(Baltimore_city_Maryland_Emissions,.(year,type),summarise,total_emissions=sum(Emissions))
 qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~type, 
       geom="path", ylab="Total Emissions (tons)", xlab="Year", 
       main="Total Annual Emissions in Baltimore by Type")
-
 ```
+
+![plot of chunk emissions in baltimore by type](figure/emissions in baltimore by type-1.png) 
 
 4.Across the United States, how have emissions from coal combustion-related sources changed from 1999-2008?
 Find the SCC data that has SCC$EI.Sector with the word coal or SCC$SCC.Level.Three having the word "coal"
-```{r finding the Coal codes}
+
+```r
 Scc_level_3_Names <- count(SCC$SCC.Level.Three)
+```
+
+```
+## Error in UseMethod("group_by_"): no applicable method for 'group_by_' applied to an object of class "factor"
+```
+
+```r
 Scc_level_3_Coal <-Scc_level_3_Names[grep("Coal",Scc_level_3_Names)]
 Scc_Codes_Coal <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Coal]
 US_Coal_Emissions <- NEI[NEI$SCC %in% Scc_Codes_Coal,]
@@ -122,8 +143,11 @@ plot(annual_coal_emissions, type="h",
      main="Total annual Coal emissions")
 ```
 
+![plot of chunk finding the Coal codes](figure/finding the Coal codes-1.png) 
+
 5.How have emissions from motor vehicle sources changed from 1999-2008 in Baltimore City? 
-```{r finding the motor vehicle codes}
+
+```r
 Scc_level_3_Vehicles <-Scc_level_3_Names[grep("Vehicle",Scc_level_3_Names)]
 Scc_Codes_Vehicles <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Vehicles]
 Baltimore_Vehicle_Emissions <- Baltimore_city_Maryland_Emissions[Baltimore_city_Maryland_Emissions$SCC %in% Scc_Codes_Vehicles,]
@@ -133,8 +157,11 @@ plot(annual_vehicle_emissions_baltimore, type="h",
      main="Total annual vehicle emissions in Baltimore")
 ```
 
+![plot of chunk finding the motor vehicle codes](figure/finding the motor vehicle codes-1.png) 
+
 6.Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
-```{r comparing Baltimore to Los Angeles Vehicle Emissions}
+
+```r
 LosAngeles_County_California_Emissions <- NEI[NEI$fips=="06037",]
 LosAngeles_Vehicle_Emissions <- LosAngeles_County_California_Emissions[LosAngeles_County_California_Emissions$SCC %in% Scc_Codes_Vehicles,]
 annual_vehicle_emissions_losangeles <- ddply(LosAngeles_Vehicle_Emissions,.(year),summarise,total_emissions=sum(Emissions))
@@ -144,10 +171,19 @@ annual_vehicle_emissions_baltimore$Rel <- annual_vehicle_emissions_baltimore$tot
 combined_vehicle_emissions <- rbind(cbind(annual_vehicle_emissions_losangeles, City="Los Angeles"), 
                                     cbind(annual_vehicle_emissions_baltimore, City="Baltimore"))
 library(ggplot)
+```
+
+```
+## Error in library(ggplot): there is no package called 'ggplot'
+```
+
+```r
 qplot(year, Rel, data=combined_vehicle_emissions, facets=.~City, 
       geom="path", ylab="Relative Emissions", xlab="Year", 
       main="Relative Annual Vehicle Emissions in Baltimore and Los Angeles")
 ```
+
+![plot of chunk comparing Baltimore to Los Angeles Vehicle Emissions](figure/comparing Baltimore to Los Angeles Vehicle Emissions-1.png) 
 
 
 #Answers
