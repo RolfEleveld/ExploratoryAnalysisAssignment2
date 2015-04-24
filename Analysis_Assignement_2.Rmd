@@ -84,14 +84,18 @@ Since there is only `r unique(NEI$Pollutant)` in the samples, they can be summed
 ```{r summing up the pollutants}
 library(plyr)
 annual_pollutants <- ddply(NEI,.(year),summarise,total_emissions=sum(Emissions))
-plot(annual_pollutants, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual emissions")
+plot(annual_pollutants, type="h", 
+     xlab="Year", ylab="Total PM25 Emissions (tons)", 
+     main="Total annual emissions")
 ```
 
 2.Have total emissions from PM2.5 decreased in the Baltimore City, Maryland (fips == "24510") from 1999 to 2008? Use the base plotting system to make a plot answering this question.
 ```{r emissions in Baltimore}
 Baltimore_city_Maryland_Emissions <- NEI[NEI$fips=="24510",]
 baltimore_annual_pollutants <- ddply(Baltimore_city_Maryland_Emissions,.(year),summarise,total_emissions=sum(Emissions))
-plot(baltimore_annual_pollutants, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual emissions in Baltimore")
+plot(baltimore_annual_pollutants, type="h", 
+     xlab="Year", ylab="Total PM25 Emissions (tons)", 
+     main="Total annual emissions in Baltimore")
 ```
 
 3.Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable, which of these four sources have seen decreases in emissions from 1999-2008 for Baltimore City? Which have seen increases in emissions from 1999-2008? Use the ggplot2 plotting system to make a plot answer this question.
@@ -99,7 +103,9 @@ plot(baltimore_annual_pollutants, type="h", xlab="Year", ylab="Total PM25 Emissi
 library(ggplot2)
 #need to combine emissions per type per year first
 baltimore_annual_pollutants_by_type <- ddply(Baltimore_city_Maryland_Emissions,.(year,type),summarise,total_emissions=sum(Emissions))
-qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~type, geom="path", ylab="Total Emissions (tons)", xlab="Year", main="Total Annual Emissions in Baltimore by Type")
+qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~type, 
+      geom="path", ylab="Total Emissions (tons)", xlab="Year", 
+      main="Total Annual Emissions in Baltimore by Type")
 
 ```
 
@@ -111,7 +117,9 @@ Scc_level_3_Coal <-Scc_level_3_Names[grep("Coal",Scc_level_3_Names)]
 Scc_Codes_Coal <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Coal]
 US_Coal_Emissions <- NEI[NEI$SCC %in% Scc_Codes_Coal,]
 annual_coal_emissions <- ddply(US_Coal_Emissions,.(year),summarise,total_emissions=sum(Emissions))
-plot(annual_coal_emissions, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual Coal emissions")
+plot(annual_coal_emissions, type="h", 
+     xlab="Year", ylab="Total PM25 Emissions (tons)", 
+     main="Total annual Coal emissions")
 ```
 
 5.How have emissions from motor vehicle sources changed from 1999-2008 in Baltimore City? 
@@ -120,10 +128,27 @@ Scc_level_3_Vehicles <-Scc_level_3_Names[grep("Vehicle",Scc_level_3_Names)]
 Scc_Codes_Vehicles <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Vehicles]
 Baltimore_Vehicle_Emissions <- Baltimore_city_Maryland_Emissions[Baltimore_city_Maryland_Emissions$SCC %in% Scc_Codes_Vehicles,]
 annual_vehicle_emissions_baltimore <- ddply(Baltimore_Vehicle_Emissions,.(year),summarise,total_emissions=sum(Emissions))
-plot(annual_vehicle_emissions_baltimore, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual vehicle emissions in Baltimore")
+plot(annual_vehicle_emissions_baltimore, type="h", 
+     xlab="Year", ylab="Total PM25 Emissions (tons)", 
+     main="Total annual vehicle emissions in Baltimore")
 ```
 
 6.Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
+```{r comparing Baltimore to Los Angeles Vehicle Emissions}
+LosAngeles_County_California_Emissions <- NEI[NEI$fips=="06037",]
+LosAngeles_Vehicle_Emissions <- LosAngeles_County_California_Emissions[LosAngeles_County_California_Emissions$SCC %in% Scc_Codes_Vehicles,]
+annual_vehicle_emissions_losangeles <- ddply(LosAngeles_Vehicle_Emissions,.(year),summarise,total_emissions=sum(Emissions))
+#adding relative value
+annual_vehicle_emissions_losangeles$Rel <- annual_vehicle_emissions_losangeles$total_emissions / mean(annual_vehicle_emissions_losangeles$total_emissions)
+annual_vehicle_emissions_baltimore$Rel <- annual_vehicle_emissions_baltimore$total_emissions / mean(annual_vehicle_emissions_baltimore$total_emissions)
+combined_vehicle_emissions <- rbind(cbind(annual_vehicle_emissions_losangeles, City="Los Angeles"), 
+                                    cbind(annual_vehicle_emissions_baltimore, City="Baltimore"))
+library(ggplot)
+qplot(year, Rel, data=combined_vehicle_emissions, facets=.~City, 
+      geom="path", ylab="Relative Emissions", xlab="Year", 
+      main="Relative Annual Vehicle Emissions in Baltimore and Los Angeles")
+```
+
 
 #Answers
 Making and Submitting Plots
