@@ -323,13 +323,8 @@ qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~
 <p>4.Across the United States, how have emissions from coal combustion-related sources changed from 1999-2008?
 Find the SCC data that has SCC$EI.Sector with the word coal or SCC$SCC.Level.Three having the word &ldquo;coal&rdquo;</p>
 
-<pre><code class="r">Scc_level_3_Names &lt;- count(SCC$SCC.Level.Three)
-</code></pre>
-
-<pre><code>## Error in UseMethod(&quot;group_by_&quot;): no applicable method for &#39;group_by_&#39; applied to an object of class &quot;factor&quot;
-</code></pre>
-
-<pre><code class="r">Scc_level_3_Coal &lt;-Scc_level_3_Names[grep(&quot;Coal&quot;,Scc_level_3_Names)]
+<pre><code class="r">Scc_level_3_Names &lt;- levels(SCC$SCC.Level.Three)
+Scc_level_3_Coal &lt;-Scc_level_3_Names[grep(&quot;Coal&quot;,Scc_level_3_Names)]
 Scc_Codes_Coal &lt;- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Coal]
 US_Coal_Emissions &lt;- NEI[NEI$SCC %in% Scc_Codes_Coal,]
 annual_coal_emissions &lt;- ddply(US_Coal_Emissions,.(year),summarise,total_emissions=sum(Emissions))
@@ -363,13 +358,7 @@ annual_vehicle_emissions_losangeles$Rel &lt;- annual_vehicle_emissions_losangele
 annual_vehicle_emissions_baltimore$Rel &lt;- annual_vehicle_emissions_baltimore$total_emissions / mean(annual_vehicle_emissions_baltimore$total_emissions)
 combined_vehicle_emissions &lt;- rbind(cbind(annual_vehicle_emissions_losangeles, City=&quot;Los Angeles&quot;), 
                                     cbind(annual_vehicle_emissions_baltimore, City=&quot;Baltimore&quot;))
-library(ggplot)
-</code></pre>
-
-<pre><code>## Error in library(ggplot): there is no package called &#39;ggplot&#39;
-</code></pre>
-
-<pre><code class="r">qplot(year, Rel, data=combined_vehicle_emissions, facets=.~City, 
+qplot(year, Rel, data=combined_vehicle_emissions, facets=.~City, 
       geom=&quot;path&quot;, ylab=&quot;Relative Emissions&quot;, xlab=&quot;Year&quot;, 
       main=&quot;Relative Annual Vehicle Emissions in Baltimore and Los Angeles&quot;)
 </code></pre>

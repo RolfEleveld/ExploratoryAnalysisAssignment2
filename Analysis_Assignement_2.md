@@ -126,14 +126,7 @@ qplot(year, total_emissions, data=baltimore_annual_pollutants_by_type, facets=.~
 Find the SCC data that has SCC$EI.Sector with the word coal or SCC$SCC.Level.Three having the word "coal"
 
 ```r
-Scc_level_3_Names <- count(SCC$SCC.Level.Three)
-```
-
-```
-## Error in UseMethod("group_by_"): no applicable method for 'group_by_' applied to an object of class "factor"
-```
-
-```r
+Scc_level_3_Names <- levels(SCC$SCC.Level.Three)
 Scc_level_3_Coal <-Scc_level_3_Names[grep("Coal",Scc_level_3_Names)]
 Scc_Codes_Coal <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Coal]
 US_Coal_Emissions <- NEI[NEI$SCC %in% Scc_Codes_Coal,]
@@ -170,14 +163,6 @@ annual_vehicle_emissions_losangeles$Rel <- annual_vehicle_emissions_losangeles$t
 annual_vehicle_emissions_baltimore$Rel <- annual_vehicle_emissions_baltimore$total_emissions / mean(annual_vehicle_emissions_baltimore$total_emissions)
 combined_vehicle_emissions <- rbind(cbind(annual_vehicle_emissions_losangeles, City="Los Angeles"), 
                                     cbind(annual_vehicle_emissions_baltimore, City="Baltimore"))
-library(ggplot)
-```
-
-```
-## Error in library(ggplot): there is no package called 'ggplot'
-```
-
-```r
 qplot(year, Rel, data=combined_vehicle_emissions, facets=.~City, 
       geom="path", ylab="Relative Emissions", xlab="Year", 
       main="Relative Annual Vehicle Emissions in Baltimore and Los Angeles")
