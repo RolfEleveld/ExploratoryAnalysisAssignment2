@@ -113,7 +113,15 @@ US_Coal_Emissions <- NEI[NEI$SCC %in% Scc_Codes_Coal,]
 annual_coal_emissions <- ddply(US_Coal_Emissions,.(year),summarise,total_emissions=sum(Emissions))
 plot(annual_coal_emissions, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual Coal emissions")
 ```
+
 5.How have emissions from motor vehicle sources changed from 1999-2008 in Baltimore City? 
+```{r finding the motor vehicle codes}
+Scc_level_3_Vehicles <-Scc_level_3_Names[grep("Vehicle",Scc_level_3_Names)]
+Scc_Codes_Vehicles <- SCC$SCC[SCC$SCC.Level.Three %in% Scc_level_3_Vehicles]
+Baltimore_Vehicle_Emissions <- Baltimore_city_Maryland_Emissions[Baltimore_city_Maryland_Emissions$SCC %in% Scc_Codes_Vehicles,]
+annual_vehicle_emissions_baltimore <- ddply(Baltimore_Vehicle_Emissions,.(year),summarise,total_emissions=sum(Emissions))
+plot(annual_vehicle_emissions_baltimore, type="h", xlab="Year", ylab="Total PM25 Emissions (tons)", main="Total annual vehicle emissions in Baltimore")
+```
 
 6.Compare emissions from motor vehicle sources in Baltimore City with emissions from motor vehicle sources in Los Angeles County, California (fips == "06037"). Which city has seen greater changes over time in motor vehicle emissions?
 
